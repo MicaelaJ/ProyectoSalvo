@@ -72,16 +72,20 @@ public class SalvoController {
     // dto del gamePlayer con id igual al id que me pasan, si esta autorizado
 
     @RequestMapping("/game_view/{gamePlayer_Id}")
-    public ResponseEntity<Map<String, Object>> getGameView(@PathVariable Long gamePlayer_Id,
-                                                           Authentication authentication) {
+    public ResponseEntity<Map<String, Object>> GameView(@PathVariable Long gamePlayer_Id,
+                                                        Authentication authentication) {
 
         Player player = playerRepository.findByUserName(authentication.getName());
-        GamePlayer gamePlayer = gamePlayerRepository.findById(gamePlayer_Id).get();
+        GamePlayer gamePlayer = gamePlayerRepository.findById(gamePlayer_Id).orElse(null);
 
         if (player != null) {
-            if (gamePlayer.getPlayer().getId() == player.getId()) {
-                return new ResponseEntity<>(makeGameViewDTO(gamePlayer), HttpStatus.CREATED);
+            if(gamePlayer   !=  null){
+                if (gamePlayer.getPlayer().getId() == player.getId()) {
+                    return new ResponseEntity<>(makeGameViewDTO(gamePlayer), HttpStatus.CREATED);
+                }
             }
+
+            return new ResponseEntity<>(makeMap("error", "Unauthorized"), HttpStatus.UNAUTHORIZED);
         }
 
         return new ResponseEntity<>(makeMap("error", "Unauthorized"), HttpStatus.UNAUTHORIZED);
@@ -116,7 +120,7 @@ public class SalvoController {
         Set<Salvo> salvos = gamePlayer.getSalvos();
         dto.put("id", gamePlayer.getGame().getId());
         dto.put("created", gamePlayer.getGame().getCreationDate());
-        dto.put("gameState", "PLACESHIPS");
+        dto.put("gameState", getStateParty(gamePlayer));
         dto.put("gamePlayers", getAllGamePlayers(gamePlayer.getGame().getGamePlayers()));
         dto.put("ships", getAllShips(ships));
         dto.put("salvoes", getAllSalvos(salvos));
@@ -191,17 +195,14 @@ public class SalvoController {
             return new ResponseEntity<>
                     (makeMap("error", "There is no current user logged in"), HttpStatus.UNAUTHORIZED);
         }
-
         if (!gamePlayerRepository.findById(gamePlayerId).isPresent()) {
             return new ResponseEntity<>
                     (makeMap("error", "There is no game player with the given ID"), HttpStatus.UNAUTHORIZED);
         }
-
         if (gamePlayer.getPlayer().getId() != player.getId()) {
             return new ResponseEntity<>(makeMap("error", "The current player is not the game player the ID references"),
                     HttpStatus.UNAUTHORIZED);
         }
-
         if (!gamePlayer.getShips().isEmpty()) {
             return new ResponseEntity<>
                     (makeMap("error", "The player already has ships placed"), HttpStatus.FORBIDDEN);
@@ -240,16 +241,10 @@ public class SalvoController {
                     HttpStatus.UNAUTHORIZED);
         }
 
-        Set<Salvo> salvos = gamePlayer.getSalvos();
-        for (Salvo salvo1 : salvos) {
-            if (salvo.getTurn() == salvo1.getTurn()) {
-                return new ResponseEntity<>
-                        (makeMap("error", "The player already has submitted a salvo for the turn listed"),
-                                HttpStatus.FORBIDDEN);
-            }
-        }
+
 
         salvo.setGamePlayer(gamePlayer);
+        salvo.setTurn(gamePlayer.getSalvos().size()+1);
         salvoRepository.save(salvo);
         return new ResponseEntity<>(makeMap("addSalvoes", "Salvos save"), HttpStatus.CREATED);
     }
@@ -333,7 +328,7 @@ public class SalvoController {
             dto.put("turn", salvo.getTurn());
             dto.put("hitLocations", getHitsLocations(gamePlayer, salvo));
             dto.put("damages", demageDto);
-            dto.put("missed", "");
+            dto.put("missed", salvo.getSalvoLocations().size() - getHitsLocations(gamePlayer, salvo).size());
 
             demageDto.put("carrierHits", getHitsType(gamePlayer, salvo, "Carrier"));
             demageDto.put("battleshipHits", getHitsType(gamePlayer, salvo, "Cattleship"));
@@ -351,6 +346,21 @@ public class SalvoController {
         }
 
         return list;
+    }
+
+
+    private GameState getStateParty(GamePlayer gamePlayer){
+
+        if(gamePlayer.getShips().size() == 0){
+            return GameState.PLACESHIPS;
+        }
+        if(gamePlayer.getGame().getGamePlayers().size() == 1){
+            return GameState.WAITINGFOROPP;
+        }
+
+
+
+        return GameState.UNDEFINED;
     }
 
     // Get Opponent
@@ -372,6 +382,7 @@ public class SalvoController {
                 .flatMap(ship -> ship.getLocations().stream())
                 .collect(toList());
         ships.retainAll(salvo.getSalvoLocations());
+
         if (ships.size() == 0) {
             return 0;
 
@@ -408,6 +419,7 @@ public class SalvoController {
                 .map(gamePlayer -> gamePlayer.getGamePlayerDTO())
                 .collect(Collectors.toList());
     }
+
 }
 
 
