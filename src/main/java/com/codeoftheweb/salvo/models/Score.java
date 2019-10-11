@@ -11,6 +11,7 @@ import java.util.Map;
 public class Score {
 
     /* ======================= Atributos ======================= */
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
     @GenericGenerator(name = "native", strategy = "native")
@@ -30,6 +31,7 @@ public class Score {
     private Player player;
 
     /* ======================= Constructor ======================= */
+
     public Score() {
     }
 
@@ -41,6 +43,7 @@ public class Score {
     }
 
     /* ======================= Getters ======================= */
+
     public long getId() {
         return id;
     }
@@ -62,6 +65,7 @@ public class Score {
     }
 
     /* ======================= Setters ======================= */
+
     public void setId(long id) {
         this.id = id;
     }
@@ -83,6 +87,7 @@ public class Score {
     }
 
     /* ======================= DTO ======================= */
+
     public Map<String, Object> scoreDTO() {
         Map<String, Object> dto = new LinkedHashMap<>();
         dto.put("player", this.getPlayer().getId());

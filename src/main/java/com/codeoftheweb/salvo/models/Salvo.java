@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 public class Salvo {
 
     /* ======================= Atributos ======================= */
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
     @GenericGenerator(name = "native", strategy = "native")
@@ -27,7 +28,18 @@ public class Salvo {
     @Column(name = "salvoLocations")
     private Set<String> salvoLocations = new HashSet<>();
 
+
+    /* ======================= Salvo Location ======================= */
+
+    private List<Map<String, Object>> getAllSalvos(Set<Salvo> salvos) {
+        return salvos
+                .stream()
+                .map(salvo -> salvo.salvoDTO())
+                .collect(Collectors.toList());
+    }
+
     /* ======================= Constructor ======================= */
+
     public Salvo() {
     }
 
@@ -38,6 +50,7 @@ public class Salvo {
     }
 
     /* ======================= Getters ======================= */
+
     public long getId() {
         return id;
     }
@@ -59,6 +72,7 @@ public class Salvo {
     }
 
     /* ======================= Setters ======================= */
+
     public void setTurn(int turn) {
         this.turn = turn;
     }
@@ -73,6 +87,7 @@ public class Salvo {
     }
 
     /* ======================= DTO ======================= */
+
     public Map<String, Object> salvoDTO() {
         Map<String, Object> dto = new LinkedHashMap<>();
         dto.put("turn", this.getTurn());

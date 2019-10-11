@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 public class GamePlayer {
 
     /* ======================= Atributos ======================= */
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
     @GenericGenerator(name = "native", strategy = "native")
@@ -38,6 +39,7 @@ public class GamePlayer {
 
 
     /* ======================= Constructor ======================= */
+
     public GamePlayer() {
     }
 
@@ -54,6 +56,7 @@ public class GamePlayer {
     }
 
     /* ======================= Getters ======================= */
+
     public Long getId() {
         return id;
     }
@@ -80,6 +83,7 @@ public class GamePlayer {
 
 
     /* ======================= Setters ======================= */
+
     public void setId(long id) {
         this.id = id;
     }
@@ -105,6 +109,7 @@ public class GamePlayer {
     }
 
     /* =======================  DTO ======================= */
+
     public Map<String, Object> getGamePlayerDTO() {
         Map<String, Object> dto = new LinkedHashMap<String, Object>();
         dto.put("id", this.getId());
@@ -114,6 +119,7 @@ public class GamePlayer {
     }
 
     /* Metodos */
+
     public void addShip(Ship ship) {
         this.ships.add(ship);
         ship.setGamePlayer(this);
@@ -123,7 +129,6 @@ public class GamePlayer {
         this.salvos.add(salvo);
         salvo.setGamePlayer(this);
     }
-
 }
 
 

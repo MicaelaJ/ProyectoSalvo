@@ -12,6 +12,7 @@ import java.util.Optional;
 public interface GameRepository extends JpaRepository<Game, Long> {
     @Override
     Game getOne(Long id);
+
     List<Game> findByCreationDate(Date creationDate);
 }
 //no es necesario el finby...

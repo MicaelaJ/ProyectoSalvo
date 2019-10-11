@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 public class Ship {
 
     /* ======================= Atributos ======================= */
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
     @GenericGenerator(name = "native", strategy = "native")
@@ -34,6 +35,7 @@ public class Ship {
     }
 
     /* ======================= Constructor ======================= */
+
     public Ship() {
     }
 
@@ -44,6 +46,7 @@ public class Ship {
     }
 
     /* ======================= Getters ======================= */
+
     public long getId() {
         return id;
     }
@@ -66,6 +69,7 @@ public class Ship {
 
 
     /* ======================= Setters ======================= */
+
     public void setId(long id) {
         this.id = id;
     }

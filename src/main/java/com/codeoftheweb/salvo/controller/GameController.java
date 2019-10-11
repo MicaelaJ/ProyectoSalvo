@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api") //para cambiar la raiz de la ruta
+@RequestMapping("/api")
 public class GameController {
 
     @Autowired
@@ -30,22 +30,26 @@ public class GameController {
     private PlayerRepository playerRepository;
 
     /* ======================= Create Game ======================= */
-    /*metodo que verifica si el usuario esta autenticado y crea un nuevo juego*/
+
+    /* metodo que verifica si el usuario esta autenticado y crea un nuevo juego
+     * "Create game" button en el front end */
 
     @RequestMapping(path = "/games", method = RequestMethod.POST)
     public ResponseEntity<Map<String, Object>> createGame(Authentication authentication) {
+
         if (authentication == null) {
             return new ResponseEntity<>(MakeMap("error", "No player logged in"), HttpStatus.UNAUTHORIZED);
         }
+
         Game game = gameRepository.save(new Game());
         GamePlayer gamePlayer = gamePlayerRepository.save(new GamePlayer(game, playerRepository.findByUserName(authentication.getName())));
         return new ResponseEntity<>(MakeMap("gpid", gamePlayer.getId()), HttpStatus.CREATED);
     }
 
-    private Map<String, Object> MakeMap(String error, Object value) {
+    //Metodo para hacer DTO con key y value
+    private Map<String, Object> MakeMap(String key, Object value) {
         Map<String, Object> map = new HashMap<>();
-        map.put(error, value);
+        map.put(key, value);
         return map;
     }
-
 }

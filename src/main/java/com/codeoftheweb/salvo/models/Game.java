@@ -9,6 +9,7 @@ import java.util.*;
 public class Game {
 
     /* ======================= Atributos ======================= */
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
     @GenericGenerator(name = "native", strategy = "native")
@@ -26,6 +27,7 @@ public class Game {
     private Set<Score> scores;
 
     /* ======================= Constructor ======================= */
+
     public Game() {
     }
 
@@ -35,6 +37,7 @@ public class Game {
     }
 
     /* ======================= Getters ======================= */
+
     public long getId() {
         return id;
     }
@@ -52,6 +55,7 @@ public class Game {
     }
 
     /* ======================= Setters ======================= */
+
     public void setId(long id) {
         this.id = id;
     }

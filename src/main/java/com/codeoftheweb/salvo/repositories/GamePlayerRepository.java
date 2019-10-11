@@ -9,6 +9,6 @@ import java.util.Optional;
 
 @RepositoryRestResource
 public interface GamePlayerRepository extends JpaRepository<GamePlayer, Long> {
-    Optional<GamePlayer> findById (@Param("id")Long id);
+    Optional<GamePlayer> findById(@Param("id") Long id);
 
 }
