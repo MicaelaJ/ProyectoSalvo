@@ -79,7 +79,7 @@ public class SalvoController {
         GamePlayer gamePlayer = gamePlayerRepository.findById(gamePlayer_Id).orElse(null);
 
         if (player != null) {
-            if(gamePlayer   !=  null){
+            if (gamePlayer != null) {
                 if (gamePlayer.getPlayer().getId() == player.getId()) {
                     return new ResponseEntity<>(makeGameViewDTO(gamePlayer), HttpStatus.CREATED);
                 }
@@ -120,7 +120,7 @@ public class SalvoController {
         Set<Salvo> salvos = gamePlayer.getSalvos();
         dto.put("id", gamePlayer.getGame().getId());
         dto.put("created", gamePlayer.getGame().getCreationDate());
-        dto.put("gameState", getStateParty(gamePlayer));
+        dto.put("gameState", getGameState(gamePlayer));
         dto.put("gamePlayers", getAllGamePlayers(gamePlayer.getGame().getGamePlayers()));
         dto.put("ships", getAllShips(ships));
         dto.put("salvoes", getAllSalvos(salvos));
@@ -218,7 +218,7 @@ public class SalvoController {
     /* verifica player
      * "add salvos" button en el front end. */
 
-    @RequestMapping(path = "/games/players/{gamePlayerId}/salvos", method = RequestMethod.POST)
+    @RequestMapping(path = "/games/players/{gamePlayerId}/salvoes", method = RequestMethod.POST)
     public ResponseEntity<Map<String, Object>> addSalvoes(@PathVariable Long gamePlayerId,
                                                           @RequestBody Salvo salvo,
                                                           Authentication authentication) {
@@ -240,14 +240,20 @@ public class SalvoController {
             return new ResponseEntity<>(makeMap("error", "The current player is not the game player the ID references"),
                     HttpStatus.UNAUTHORIZED);
         }
-
-
-
-        salvo.setGamePlayer(gamePlayer);
-        salvo.setTurn(gamePlayer.getSalvos().size()+1);
-        salvoRepository.save(salvo);
-        return new ResponseEntity<>(makeMap("addSalvoes", "Salvos save"), HttpStatus.CREATED);
+        int turn = gamePlayer.getSalvos().size() + 1;
+        if (salvo.getTurn() > turn || gamePlayer.getSalvos().size() > getOpponent(gamePlayer).getSalvos().size()) {
+            return new ResponseEntity<>(makeMap("Error", "You can't fire salvos"), HttpStatus.FORBIDDEN);
+        } else {
+            if (salvo.getSalvoLocations().size() > 5) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            } else {
+                Salvo salvo1 = new Salvo(turn, gamePlayer, salvo.getSalvoLocations());
+                salvoRepository.save(salvo1);
+                return new ResponseEntity<>(makeMap("Ok", "Salvo added"), HttpStatus.CREATED);
+            }
+        }
     }
+
 
     // Tabla de clasificasiones
     @RequestMapping("/leaderBoard")
@@ -315,11 +321,11 @@ public class SalvoController {
 
         for (Salvo salvo : getOpponent(gamePlayer).getSalvos()) {
             long
-                    carrieHits = 0,
-                    battleshipHits = 0,
-                    submarineHits = 0,
-                    destroyerHits = 0,
-                    patrolboatHits = 0;
+                    carrieHits = getHitsType(gamePlayer, salvo, "Carrier"),
+                    battleshipHits = getHitsType(gamePlayer, salvo, "Battleship"),
+                    submarineHits = getHitsType(gamePlayer, salvo, "Submarine"),
+                    destroyerHits = getHitsType(gamePlayer, salvo, "Destroyer"),
+                    patrolboatHits = getHitsType(gamePlayer, salvo, "Patrol Boat");
 
 
             Map<String, Object> dto = new LinkedHashMap<String, Object>();
@@ -330,17 +336,24 @@ public class SalvoController {
             dto.put("damages", demageDto);
             dto.put("missed", salvo.getSalvoLocations().size() - getHitsLocations(gamePlayer, salvo).size());
 
-            demageDto.put("carrierHits", getHitsType(gamePlayer, salvo, "Carrier"));
-            demageDto.put("battleshipHits", getHitsType(gamePlayer, salvo, "Cattleship"));
-            demageDto.put("submarineHits", getHitsType(gamePlayer, salvo, "Submarine"));
-            demageDto.put("destroyerHits", getHitsType(gamePlayer, salvo, "Destroyer"));
-            demageDto.put("patrolboatHits", getHitsType(gamePlayer, salvo, "Patrol Boat"));
+            demageDto.put("carrierHits", carrieHits);
+            demageDto.put("battleshipHits", battleshipHits);
+            demageDto.put("submarineHits", submarineHits);
+            demageDto.put("destroyerHits", destroyerHits);
+            demageDto.put("patrolboatHits", patrolboatHits);
 
-            demageDto.put("carrier", carrierDemage + getHitsType(gamePlayer, salvo, "Carrier"));
-            demageDto.put("battleship", battleshipDemage + getHitsType(gamePlayer, salvo, "Battleship"));
-            demageDto.put("submarine", submarineDemage + getHitsType(gamePlayer, salvo, "Submarine"));
-            demageDto.put("destroyer", destroyerDemage + getHitsType(gamePlayer, salvo, "Destroyer"));
-            demageDto.put("patrolboat", patrolboatDemage + getHitsType(gamePlayer, salvo, "Patrol Boat"));
+            carrierDemage += carrieHits;
+            battleshipDemage += battleshipHits;
+            submarineDemage += submarineHits;
+            destroyerDemage += carrieHits;
+            patrolboatDemage += destroyerHits;
+
+
+            demageDto.put("carrier", carrierDemage);
+            demageDto.put("battleship", battleshipDemage);
+            demageDto.put("submarine", submarineDemage);
+            demageDto.put("destroyer", destroyerDemage);
+            demageDto.put("patrolboat", patrolboatDemage);
 
             list.add(dto);
         }
@@ -349,18 +362,36 @@ public class SalvoController {
     }
 
 
-    private GameState getStateParty(GamePlayer gamePlayer){
+    private String getGameState(GamePlayer gamePlayer) {
+        String gameState = "";
+        if (getOpponent(gamePlayer) != null) {
 
-        if(gamePlayer.getShips().size() == 0){
-            return GameState.PLACESHIPS;
+            if (gamePlayer.getShips().size() == 0) {
+                gameState = "PLACESHIPS";
+            }
+            if (gamePlayer.getShips().size() != 0) {
+                gameState = "WAITINGFOROPP";
+
+                if (getOpponent(gamePlayer).getShips().size() == 0) {
+                    gameState = "PLACESHIPS";
+                } else {
+                    gameState = "WAITINGFOROPP";
+                }
+            }
+            if (gamePlayer.getShips().size() != 0 && getOpponent(gamePlayer).getShips().size() != 0) {
+                gameState = "PLAY";
+            }
+            if (gamePlayer.getSalvos().size() != getOpponent(gamePlayer).getSalvos().size()) {
+                gameState = "WAIT";
+            }
+            if (gamePlayer.getSalvos().size() > getOpponent(gamePlayer).getSalvos().size()) {
+                gameState = "PLAY";
+            }
+
+        } else {
+            gameState = "PLACESHIPS";
         }
-        if(gamePlayer.getGame().getGamePlayers().size() == 1){
-            return GameState.WAITINGFOROPP;
-        }
-
-
-
-        return GameState.UNDEFINED;
+        return gameState;
     }
 
     // Get Opponent
@@ -374,7 +405,7 @@ public class SalvoController {
         return opponent;
     }
 
-    // Hits Type
+    // get Hits Type
     private long getHitsType(GamePlayer gamePlayer, Salvo salvo, String type) {
         List<String> ships = gamePlayer.getShips()
                 .stream()
@@ -390,7 +421,7 @@ public class SalvoController {
         return ships.size();
     }
 
-    // Hits Locations
+    // get Hits Locations
     private List<String> getHitsLocations(GamePlayer gamePlayer, Salvo salvo) {
         List<String> ships = gamePlayer.getShips()
                 .stream()
@@ -421,6 +452,3 @@ public class SalvoController {
     }
 
 }
-
-
-

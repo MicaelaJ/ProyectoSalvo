@@ -67,6 +67,9 @@ public class Game {
     public void setScores() {
         this.scores = scores;
     }
-}
 
+    public void setCreationDate(Date creationDate) {
+        this.creationDate = creationDate;
+    }
+}
 
