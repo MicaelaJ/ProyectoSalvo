@@ -8,9 +8,7 @@ import java.util.stream.Collectors;
 
 @Entity
 public class Ship {
-
     /* ======================= Atributos ======================= */
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
     @GenericGenerator(name = "native", strategy = "native")
@@ -27,15 +25,8 @@ public class Ship {
     @Column(name = "shipLocations")
     private Set<String> locations = new HashSet<>();
 
-    public Map<String, Object> shipDTO() {
-        Map<String, Object> dto = new LinkedHashMap<>();
-        dto.put("type", this.getType());
-        dto.put("locations", this.getLocations());
-        return dto;
-    }
 
     /* ======================= Constructor ======================= */
-
     public Ship() {
     }
 
@@ -46,7 +37,6 @@ public class Ship {
     }
 
     /* ======================= Getters ======================= */
-
     public long getId() {
         return id;
     }
@@ -69,7 +59,6 @@ public class Ship {
 
 
     /* ======================= Setters ======================= */
-
     public void setId(long id) {
         this.id = id;
     }
@@ -86,5 +75,11 @@ public class Ship {
         this.locations = shipLocations;
     }
 
-
+    /* ======================= DTO ======================= */
+    public Map<String, Object> shipDTO() {
+        Map<String, Object> dto = new LinkedHashMap<>();
+        dto.put("type", this.getType());
+        dto.put("locations", this.getLocations());
+        return dto;
+    }
 }

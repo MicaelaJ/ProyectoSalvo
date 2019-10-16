@@ -1,17 +1,14 @@
 package com.codeoftheweb.salvo.models;
 
 import org.hibernate.annotations.GenericGenerator;
-import org.springframework.security.core.Authentication;
 
 import javax.persistence.*;
 import java.util.*;
-import java.util.stream.Collectors;
+
 
 @Entity
 public class GamePlayer {
-
     /* ======================= Atributos ======================= */
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
     @GenericGenerator(name = "native", strategy = "native")
@@ -39,7 +36,6 @@ public class GamePlayer {
 
 
     /* ======================= Constructor ======================= */
-
     public GamePlayer() {
     }
 
@@ -56,7 +52,6 @@ public class GamePlayer {
     }
 
     /* ======================= Getters ======================= */
-
     public Long getId() {
         return id;
     }
@@ -83,7 +78,6 @@ public class GamePlayer {
 
 
     /* ======================= Setters ======================= */
-
     public void setId(long id) {
         this.id = id;
     }
@@ -108,18 +102,7 @@ public class GamePlayer {
         this.joinDate = joinDate;
     }
 
-    /* =======================  DTO ======================= */
-
-    public Map<String, Object> getGamePlayerDTO() {
-        Map<String, Object> dto = new LinkedHashMap<String, Object>();
-        dto.put("id", this.getId());
-        dto.put("player", this.getPlayer().getPlayerDTO());
-        dto.put("joinDate", this.getJoinDate());
-        return dto;
-    }
-
     /* Metodos */
-
     public void addShip(Ship ship) {
         this.ships.add(ship);
         ship.setGamePlayer(this);
@@ -128,6 +111,14 @@ public class GamePlayer {
     public void addSalvo(Salvo salvo) {
         this.salvos.add(salvo);
         salvo.setGamePlayer(this);
+    }
+    /* =======================  DTO ======================= */
+    public Map<String, Object> getGamePlayerDTO() {
+        Map<String, Object> dto = new LinkedHashMap<String, Object>();
+        dto.put("id", this.getId());
+        dto.put("player", this.getPlayer().getPlayerDTO());
+        dto.put("joinDate", this.getJoinDate());
+        return dto;
     }
 }
 

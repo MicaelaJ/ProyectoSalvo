@@ -11,9 +11,7 @@ import java.util.stream.Collectors;
 
 @Entity
 public class Player {
-
     /* ======================= Atributos ======================= */
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
     @GenericGenerator(name = "native", strategy = "native")
@@ -30,7 +28,6 @@ public class Player {
     private Set<Score> scores;
 
     /* ======================= Constructor ======================= */
-
     public Player() {
     }
 
@@ -40,7 +37,6 @@ public class Player {
     }
 
     /* ======================= Getters ======================= */
-
     public long getId() {
         return id;
     }
@@ -66,7 +62,6 @@ public class Player {
     }
 
     /* ======================= Setters ======================= */
-
     public void setId(long id) {
         this.id = id;
     }
@@ -106,20 +101,17 @@ public class Player {
         return this.getWinScore() * 1.0D + this.getTiedScore() * 0.5D + this.getLostScore() * 0D;
     }
 
+    /* Metodo */
+    public void addGamePlayer(GamePlayer gamePlayer) {
+        this.gamePlayers.add(gamePlayer);
+    }
+
     /* ======================= DTO ======================= */
     //DTO para Player donde tengo id y username para cada player
-
     public Map<String, Object> getPlayerDTO() {
         Map<String, Object> dto = new LinkedHashMap<String, Object>();
         dto.put("id", this.getId());
         dto.put("email", this.getUserName());
         return dto;
     }
-
-    /* Metodo */
-
-    public void addGamePlayer(GamePlayer gamePlayer) {
-        this.gamePlayers.add(gamePlayer);
-    }
-
 }
