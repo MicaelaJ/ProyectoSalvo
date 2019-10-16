@@ -154,6 +154,7 @@ function refreshGameView(_url) {
                         $('#errorSalvo').show( "slow" ).delay(3000).hide( "slow" );
                         console.log("No salvos to shoot!");
                     } else {
+                        $("#okSalvo").text("OK, Salvo fired!");
                         postSalvo(makePostUrlSalvoes());
                     }
                 });
@@ -311,6 +312,7 @@ function postShipLocations (postUrl) {
     })
         .done(function (response) {
             console.log(response);
+            $("#okShips").text("OK, Ships placed");
             $('#okShips').text(JSON.parse(response).OK);
             $('#okShips').show( "slow" ).delay(3000).hide( "slow" );
             setTimeout(

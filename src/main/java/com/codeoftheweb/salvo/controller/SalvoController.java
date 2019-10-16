@@ -165,8 +165,8 @@ public class SalvoController {
         }
         if (joinGame.getGamePlayers().size() >= 2) {
             return new ResponseEntity<>(MakeMap("error", "Game is full"), HttpStatus.FORBIDDEN);
-        }else {
-            if (joinGame.getAllUserNames().contains(authentication.getName())){
+        } else {
+            if (joinGame.getAllUserNames().contains(authentication.getName())) {
                 return new ResponseEntity<>(makeMap("Error", "You can't play with yourself"), HttpStatus.FORBIDDEN);
             }
         }
@@ -382,7 +382,6 @@ public class SalvoController {
                 return "WAITINGFOROPP";
             }
 
-            // si mis salvoes = a los del opp y los ships sunk mios y del opp < 17: PLAY
             if ((gamePlayer.getSalvos().size() == getOpponent(gamePlayer).getSalvos().size()) &&
                     (getSunks(getOpponent(gamePlayer)) < 17 && getSunks(gamePlayer) < 17)) {
                 return "PLAY";
@@ -392,35 +391,42 @@ public class SalvoController {
                 return "WAIT";
             }
 
-            // sunks ships mios < 17 y los sunks ships del opp == 17: WON genero score
             Date date = new Date();
             if (getSunks(gamePlayer) < 17 && getSunks(getOpponent(gamePlayer)) == 17) {
-                if (gamePlayer.getGame().getScores().isEmpty()) {
+                if (gamePlayer.getGame().getScores().size() < 2) {
                     Score newScore = new Score(gamePlayer.getGame(), gamePlayer.getPlayer(), 1, date);
                     scoreRepository.save(newScore);
+                    return "WON";
+                }else{
+                    return "WON";
                 }
-                return "WON";
 
-                // si no: mis ships sunks == 17 y los del opp < 17: LOST
             } else if (getSunks(gamePlayer) == 17 && getSunks(getOpponent(gamePlayer)) < 17) {
-                if (gamePlayer.getGame().getScores().isEmpty()) {
+                if (gamePlayer.getGame().getScores().size() < 2) {
                     Score newScore = new Score(gamePlayer.getGame(), gamePlayer.getPlayer(), 0, date);
                     scoreRepository.save(newScore);
+                    return "LOST";
+                }else{
+                    return "LOST";
                 }
-                return "LOST";
 
-                // si no: mis ships sunk = 17 y los del opp = 17: TIE
             } else if (getSunks(gamePlayer) == 17 && getSunks(getOpponent(gamePlayer)) == 17) {
-                if (gamePlayer.getGame().getScores().isEmpty()) {
+                if (gamePlayer.getGame().getScores().size() < 2) {
                     Score newScore = new Score(gamePlayer.getGame(), gamePlayer.getPlayer(), 0.5, date);
                     scoreRepository.save(newScore);
+                    return "TIE";
+                }else{
+                    return "TIE";
                 }
-                return "TIE";
 
-            } else
+            } else {
                 return "WAIT";
-        }else {
-           return "WAITINGFOROPP"; }
+            }
+
+        } else {
+            return "WAITINGFOROPP";
+        }
+
     }
  /*     refactorizar: WAIT: asi aparecen los dos como won
 
