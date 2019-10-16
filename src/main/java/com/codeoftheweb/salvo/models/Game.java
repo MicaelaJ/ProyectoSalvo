@@ -4,6 +4,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Entity
 public class Game {
@@ -25,6 +26,9 @@ public class Game {
     @OneToMany(mappedBy = "game", fetch = FetchType.EAGER)
     private Set<Score> scores;
 
+    public List<String> getAllUserNames(){
+        return gamePlayers.stream().map(game -> game.getPlayer().getUserName()).collect(Collectors.toList());
+    }
     /* ======================= Constructor ======================= */
     public Game() {
     }
