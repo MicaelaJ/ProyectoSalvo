@@ -319,14 +319,16 @@ public class SalvoController {
                     patrolboatHits = getHitsType(gamePlayer, salvo, "patrolboat");
 
 
-            Map<String, Object> dto = new LinkedHashMap<String, Object>();
+            Map<String, Object> hitsDTO = new LinkedHashMap<String, Object>();
             Map<String, Object> damageDTO = new LinkedHashMap<>();
 
-            dto.put("turn", salvo.getTurn());
-            dto.put("hitLocations", getHitsLocations(gamePlayer, salvo));
-            dto.put("damages", damageDTO);
-            dto.put("missed", salvo.getSalvoLocations().size() - getHitsLocations(gamePlayer, salvo).size());
+            // hits dto/ self y opp
+            hitsDTO.put("turn", salvo.getTurn());
+            hitsDTO.put("hitLocations", getHitsLocations(gamePlayer, salvo));
+            hitsDTO.put("damages", damageDTO);
+            hitsDTO.put("missed", salvo.getSalvoLocations().size() - getHitsLocations(gamePlayer, salvo).size());
 
+            // damage dto (turnos)
             damageDTO.put("carrierHits", carrieHits);
             damageDTO.put("battleshipHits", battleshipHits);
             damageDTO.put("submarineHits", submarineHits);
@@ -339,13 +341,15 @@ public class SalvoController {
             destroyerDamage += destroyerHits;
             patrolboatDamage += patrolboatHits;
 
+            // hits a los ships
             damageDTO.put("carrier", carrierDamage);
             damageDTO.put("battleship", battleshipDamage);
             damageDTO.put("submarine", submarineDamage);
             damageDTO.put("destroyer", destroyerDamage);
             damageDTO.put("patrolboat", patrolboatDamage);
 
-            list.add(dto);
+            //Agrega el dto self y opp al dto retornado
+            list.add(hitsDTO);
         }
 
         return list;
@@ -428,35 +432,6 @@ public class SalvoController {
         }
 
     }
- /*     refactorizar: WAIT: asi aparecen los dos como won
-
-            Date date = new Date();
-            if (!(gamePlayer.getSalvos().size() > getOpponent(gamePlayer).getSalvos().size())) {
-                if (getSunks(gamePlayer) < 17 && getSunks(getOpponent(gamePlayer)) == 17) {
-                    if (gamePlayer.getGame().getScores().isEmpty()) {
-                    Score newScore = new Score(gamePlayer.getGame(), gamePlayer.getPlayer(), 1, date);
-                    scoreRepository.save(newScore);
-                }
-            }
-            return "WON";
-
-        } else if (getSunks(gamePlayer) == 17 && getSunks(getOpponent(gamePlayer)) < 17) {
-            if (gamePlayer.getGame().getScores().isEmpty()) {
-                Score newScore = new Score(gamePlayer.getGame(), gamePlayer.getPlayer(), 0, date);
-                scoreRepository.save(newScore);
-            }
-            return "LOST";
-
-        } else if (getSunks(gamePlayer) == 17 && getSunks(getOpponent(gamePlayer)) == 17) {
-            if (gamePlayer.getGame().getScores().isEmpty()) {
-                Score newScore = new Score(gamePlayer.getGame(), gamePlayer.getPlayer(), 0.5, date);
-                scoreRepository.save(newScore);
-            }
-            return "TIE";
-
-        } else
-            return "WAIT";
-    }*/
 
     // indica numero de sunks ships para verificar game over
     private int getSunks(GamePlayer gamePlayer) {
@@ -473,7 +448,7 @@ public class SalvoController {
         return ships.size();
     }
 
-    // Get Opponent
+    // Get Opponent - opp del player en un game
     private GamePlayer getOpponent(GamePlayer gamePlayer) {
         GamePlayer opponent = null;
         for (GamePlayer gamePlayer1 : gamePlayer.getGame().getGamePlayers()) {
