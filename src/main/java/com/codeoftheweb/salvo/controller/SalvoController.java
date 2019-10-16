@@ -113,13 +113,13 @@ public class SalvoController {
         }
 
         Set<Ship> ships = gamePlayer.getShips();
-        Set<Salvo> salvos = gamePlayer.getSalvos();
+        Set<Salvo> salvoes = gamePlayer.getSalvoes();
         dto.put("id", gamePlayer.getGame().getId());
         dto.put("created", gamePlayer.getGame().getCreationDate());
         dto.put("gameState", getGameState(gamePlayer));
         dto.put("gamePlayers", getAllGamePlayers(gamePlayer.getGame().getGamePlayers()));
         dto.put("ships", getAllShips(ships));
-        dto.put("salvoes", getAllSalvos(salvos));
+        dto.put("salvoes", getAllSalvos(salvoes));
         dto.put("hits", opdto);
         return dto;
     }
@@ -167,7 +167,7 @@ public class SalvoController {
             return new ResponseEntity<>(MakeMap("error", "Game is full"), HttpStatus.FORBIDDEN);
         } else {
             if (joinGame.getAllUserNames().contains(authentication.getName())) {
-                return new ResponseEntity<>(makeMap("Error", "You can't play with yourself"), HttpStatus.FORBIDDEN);
+                return new ResponseEntity<>(makeMap("error", "You can't play with yourself"), HttpStatus.FORBIDDEN);
             }
         }
 
@@ -210,7 +210,7 @@ public class SalvoController {
 
     /* ======================= Add Salvos ======================= */
     /* verifica player
-     * "add salvos" button en el front end. */
+     * "add salvoes" button en el front end. */
     @RequestMapping(path = "/games/players/{gamePlayerId}/salvoes", method = RequestMethod.POST)
     public ResponseEntity<Map<String, Object>> addSalvoes(@PathVariable Long gamePlayerId,
                                                           @RequestBody Salvo salvo,
@@ -233,16 +233,16 @@ public class SalvoController {
             return new ResponseEntity<>(makeMap("error", "The current player is not the game player the ID references"),
                     HttpStatus.UNAUTHORIZED);
         }
-        int turn = gamePlayer.getSalvos().size() + 1;
-        if (salvo.getTurn() > turn || gamePlayer.getSalvos().size() > getOpponent(gamePlayer).getSalvos().size()) {
-            return new ResponseEntity<>(makeMap("Error", "You can't fire salvos"), HttpStatus.FORBIDDEN);
+        int turn = gamePlayer.getSalvoes().size() + 1;
+        if (salvo.getTurn() > turn || gamePlayer.getSalvoes().size() > getOpponent(gamePlayer).getSalvoes().size()) {
+            return new ResponseEntity<>(makeMap("error", "You can't fire salvoes"), HttpStatus.FORBIDDEN);
         } else {
             if (salvo.getSalvoLocations().size() > 5) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             } else {
                 Salvo salvo1 = new Salvo(turn, gamePlayer, salvo.getSalvoLocations());
                 salvoRepository.save(salvo1);
-                return new ResponseEntity<>(makeMap("Ok", "Salvo added"), HttpStatus.CREATED);
+                return new ResponseEntity<>(makeMap("OK", "Salvo added"), HttpStatus.CREATED);
             }
         }
     }
@@ -266,9 +266,10 @@ public class SalvoController {
     }
 
     // Salvo Locations
-    private List<Map<String, Object>> getAllSalvos(Set<Salvo> salvos) {
-        return salvos
+    private List<Map<String, Object>> getAllSalvos(Set<Salvo> salvoes) {
+        return salvoes
                 .stream()
+               // .sorted(Comparator.comparing(Salvo::getTurn))
                 .map(salvo -> salvo.salvoDTO())
                 .collect(Collectors.toList());
     }
@@ -299,6 +300,25 @@ public class SalvoController {
         return dto;
     }
 
+    /*  ======================= Game DTOs ======================= */
+    // Game dto
+    public Map<String, Object> makeGameDTO(Game game) {
+        Map<String, Object> dto = new LinkedHashMap<String, Object>();
+        dto.put("id", game.getId());
+        dto.put("created", game.getCreationDate());
+        dto.put("gamePlayers", getAllGamePlayers(game.getGamePlayers()));
+        dto.put("scores", getAllScore(game.getScores()));
+        return dto;
+    }
+
+    // Lista de dtos de todos los gamePlayers
+    private List<Map<String, Object>> getAllGamePlayers(Set<GamePlayer> gamePlayers) {
+        return gamePlayers
+                .stream()
+                .map(gamePlayer -> gamePlayer.getGamePlayerDTO())
+                .collect(Collectors.toList());
+    }
+
     // Hits dto: para cada turno qué ships han sido golpeados y/o hundidos
     public List<Map<String, Object>> makeHitsDTO(GamePlayer gamePlayer) {
         List<Map<String, Object>> list = new ArrayList<>();
@@ -310,7 +330,7 @@ public class SalvoController {
                 destroyerDamage = 0,
                 patrolboatDamage = 0;
 
-        for (Salvo salvo : getOpponent(gamePlayer).getSalvos()) {
+        for (Salvo salvo : getOpponent(gamePlayer).getSalvoes()) {
             long
                     carrieHits = getHitsType(gamePlayer, salvo, "carrier"),
                     battleshipHits = getHitsType(gamePlayer, salvo, "battleship"),
@@ -355,25 +375,6 @@ public class SalvoController {
         return list;
     }
 
-    /*  ======================= Game DTOs ======================= */
-    // Game dto
-    public Map<String, Object> makeGameDTO(Game game) {
-        Map<String, Object> dto = new LinkedHashMap<String, Object>();
-        dto.put("id", game.getId());
-        dto.put("created", game.getCreationDate());
-        dto.put("gamePlayers", getAllGamePlayers(game.getGamePlayers()));
-        dto.put("scores", getAllScore(game.getScores()));
-        return dto;
-    }
-
-    // Lista de dtos de todos los gamePlayers
-    private List<Map<String, Object>> getAllGamePlayers(Set<GamePlayer> gamePlayers) {
-        return gamePlayers
-                .stream()
-                .map(gamePlayer -> gamePlayer.getGamePlayerDTO())
-                .collect(Collectors.toList());
-    }
-
     /* ======================= Game State ======================= */
     public String getGameState(GamePlayer gamePlayer) {
 
@@ -386,12 +387,12 @@ public class SalvoController {
                 return "WAITINGFOROPP";
             }
 
-            if ((gamePlayer.getSalvos().size() == getOpponent(gamePlayer).getSalvos().size()) &&
+            if ((gamePlayer.getSalvoes().size() == getOpponent(gamePlayer).getSalvoes().size()) &&
                     (getSunks(getOpponent(gamePlayer)) < 17 && getSunks(gamePlayer) < 17)) {
                 return "PLAY";
             }
 
-            if ((gamePlayer.getSalvos().size() > getOpponent(gamePlayer).getSalvos().size())) {
+            if ((gamePlayer.getSalvoes().size() > getOpponent(gamePlayer).getSalvoes().size())) {
                 return "WAIT";
             }
 
@@ -401,7 +402,7 @@ public class SalvoController {
                     Score newScore = new Score(gamePlayer.getGame(), gamePlayer.getPlayer(), 1, date);
                     scoreRepository.save(newScore);
                     return "WON";
-                }else{
+                } else {
                     return "WON";
                 }
 
@@ -410,7 +411,7 @@ public class SalvoController {
                     Score newScore = new Score(gamePlayer.getGame(), gamePlayer.getPlayer(), 0, date);
                     scoreRepository.save(newScore);
                     return "LOST";
-                }else{
+                } else {
                     return "LOST";
                 }
 
@@ -419,7 +420,7 @@ public class SalvoController {
                     Score newScore = new Score(gamePlayer.getGame(), gamePlayer.getPlayer(), 0.5, date);
                     scoreRepository.save(newScore);
                     return "TIE";
-                }else{
+                } else {
                     return "TIE";
                 }
 
@@ -437,14 +438,14 @@ public class SalvoController {
     private int getSunks(GamePlayer gamePlayer) {
         GamePlayer opp = getOpponent(gamePlayer);
         List<String> ships = new ArrayList<>();
-        List<String> salvos = new ArrayList<>();
+        List<String> salvoes = new ArrayList<>();
         for (Ship ship : gamePlayer.getShips()) {
             ships.addAll(ship.getLocations());
         }
-        for (Salvo salvo : opp.getSalvos()) {
-            salvos.addAll(salvo.getSalvoLocations());
+        for (Salvo salvo : opp.getSalvoes()) {
+            salvoes.addAll(salvo.getSalvoLocations());
         }
-        ships.retainAll(salvos);
+        ships.retainAll(salvoes);
         return ships.size();
     }
 
@@ -483,4 +484,13 @@ public class SalvoController {
         ships.retainAll(salvo.getSalvoLocations());
         return ships;
     }
+
+    // ordena lista
+    private List<Salvo> orderSalvoes(Set<Salvo> salvoes){
+        return salvoes
+                .stream()
+                .sorted(Comparator.comparing(Salvo::getTurn))
+                .collect(Collectors.toList());
+    }
+
 }

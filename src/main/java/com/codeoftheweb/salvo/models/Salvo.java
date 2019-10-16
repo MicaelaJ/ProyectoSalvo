@@ -27,8 +27,8 @@ public class Salvo {
     private Set<String> salvoLocations = new HashSet<>();
 
     /* ======================= Salvo Location ======================= */
-    private List<Map<String, Object>> getAllSalvos(Set<Salvo> salvos) {
-        return salvos
+    private List<Map<String, Object>> getAllSalvos(Set<Salvo> salvoes) {
+        return salvoes
                 .stream()
                 .map(salvo -> salvo.salvoDTO())
                 .collect(Collectors.toList());

@@ -32,7 +32,7 @@ public class GamePlayer {
 
     /* Metodo donde creo una relacion One to many entre GamePlayer y Salvo */
     @OneToMany(mappedBy = "gamePlayer", fetch = FetchType.EAGER)
-    private Set<Salvo> salvos;
+    private Set<Salvo> salvoes;
 
 
     /* ======================= Constructor ======================= */
@@ -72,8 +72,8 @@ public class GamePlayer {
         return ships;
     }
 
-    public Set<Salvo> getSalvos() {
-        return this.salvos;
+    public Set<Salvo> getSalvoes() {
+        return this.salvoes;
     }
 
 
@@ -94,8 +94,8 @@ public class GamePlayer {
         this.ships = ships;
     }
 
-    public void setSalvos(Set<Salvo> salvos) {
-        this.salvos = salvos;
+    public void setSalvos(Set<Salvo> salvoes) {
+        this.salvoes = salvoes;
     }
 
     public void setJoinDate(Date joinDate) {
@@ -109,7 +109,7 @@ public class GamePlayer {
     }
 
     public void addSalvo(Salvo salvo) {
-        this.salvos.add(salvo);
+        this.salvoes.add(salvo);
         salvo.setGamePlayer(this);
     }
     /* =======================  DTO ======================= */
