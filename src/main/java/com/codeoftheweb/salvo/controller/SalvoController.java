@@ -361,38 +361,69 @@ public class SalvoController {
         return list;
     }
 
-
-    private String getGameState(GamePlayer gamePlayer) {
-        String gameState = "";
-        if (getOpponent(gamePlayer) != null) {
-
-            if (gamePlayer.getShips().size() == 0) {
-                gameState = "PLACESHIPS";
-            }
-            if (gamePlayer.getShips().size() != 0) {
-                gameState = "WAITINGFOROPP";
-
-                if (getOpponent(gamePlayer).getShips().size() == 0) {
-                    gameState = "PLACESHIPS";
-                } else {
-                    gameState = "WAITINGFOROPP";
-                }
-            }
-            if (gamePlayer.getShips().size() != 0 && getOpponent(gamePlayer).getShips().size() != 0) {
-                gameState = "PLAY";
-            }
-            if (gamePlayer.getSalvos().size() != getOpponent(gamePlayer).getSalvos().size()) {
-                gameState = "WAIT";
-            }
-            if (gamePlayer.getSalvos().size() > getOpponent(gamePlayer).getSalvos().size()) {
-                gameState = "PLAY";
-            }
-
-        } else {
-            gameState = "PLACESHIPS";
+    // Game State
+    public String getGameState(GamePlayer gamePlayer) {
+        if (gamePlayer.getShips().size() == 0) {
+            return "PLACESHIPS";
         }
-        return gameState;
+        if (getOpponent(gamePlayer) == null) {
+            return "WAITINGFOROPP";
+        }
+
+        // si mis salvoes = a los del opp y los ships sunk mios y del opp < 17: PLAY
+        if ((gamePlayer.getSalvos().size() == getOpponent(gamePlayer).getSalvos().size()) &&
+                (getSunks(getOpponent(gamePlayer)) < 17 && getSunks(gamePlayer) < 17)) {
+            return "PLAY";
+        }
+
+        if ((gamePlayer.getSalvos().size() > getOpponent(gamePlayer).getSalvos().size())) {
+            return "WAIT";
+        }
+
+        // sunks ships mios < 17 y los sunks ships del opp == 17: WON genero score
+        Date date = new Date();
+        if (getSunks(gamePlayer) < 17 && getSunks(getOpponent(gamePlayer)) == 17) {
+            if (gamePlayer.getGame().getScores().isEmpty()) {
+                Score newScore = new Score(gamePlayer.getGame(), gamePlayer.getPlayer(), 1, date);
+                scoreRepository.save(newScore);
+            }
+            return "WON";
+
+            // si no: mis ships sunks == 17 y los del opp < 17: LOST
+        } else if (getSunks(gamePlayer) == 17 && getSunks(getOpponent(gamePlayer)) < 17) {
+            if (gamePlayer.getGame().getScores().isEmpty()) {
+                Score newScore = new Score(gamePlayer.getGame(), gamePlayer.getPlayer(), 0, date);
+                scoreRepository.save(newScore);
+            }
+            return "LOST";
+
+            // si no: mis ships sunk = 17 y los del opp = 17: TIE
+        } else if (getSunks(gamePlayer) == 17 && getSunks(getOpponent(gamePlayer)) == 17) {
+            if (gamePlayer.getGame().getScores().isEmpty()) {
+                Score newScore = new Score(gamePlayer.getGame(), gamePlayer.getPlayer(), 0.5, date);
+                scoreRepository.save(newScore);
+            }
+            return "TIE";
+
+        } else
+            return "WAIT";
     }
+
+    // Metodo para indicar numero de sunks ships para verificar game over
+    private int getSunks(GamePlayer gamePlayer) {
+        GamePlayer opp = getOpponent(gamePlayer);
+        List<String> ships = new ArrayList<>();
+        List<String> salvos = new ArrayList<>();
+        for (Ship ship : gamePlayer.getShips()) {
+            ships.addAll(ship.getLocations());
+        }
+        for (Salvo salvo : opp.getSalvos()) {
+            salvos.addAll(salvo.getSalvoLocations());
+        }
+        ships.retainAll(salvos);
+        return ships.size();
+    }
+
 
     // Get Opponent
     private GamePlayer getOpponent(GamePlayer gamePlayer) {
