@@ -92,11 +92,11 @@ public class SalvoController {
     private ResponseEntity<Object> addPlayer(@RequestParam String email, @RequestParam String password) {
 
         if (email.isEmpty() || password.isEmpty()) {
-            return new ResponseEntity<>("Missing data", HttpStatus.FORBIDDEN);
+            return new ResponseEntity<>(MakeMap("error", "Missing data"), HttpStatus.FORBIDDEN);
         }
 
         if (playerRepository.findByUserName(email) != null) {
-            return new ResponseEntity<>("Name already exists", HttpStatus.FORBIDDEN);
+            return new ResponseEntity<>(makeMap("error", "Name already exists"), HttpStatus.FORBIDDEN);
         }
 
         playerRepository.save(new Player(email, passwordEncoder.encode(password)));
@@ -166,7 +166,7 @@ public class SalvoController {
 
         ships.forEach(ship -> ship.setGamePlayer(gamePlayer));
         shipRepository.saveAll(ships);
-        return new ResponseEntity<>(makeMap("addShips", "Ships created"), HttpStatus.CREATED);
+        return new ResponseEntity<>(makeMap("OK", "Ships created"), HttpStatus.CREATED);
     }
 
     /* ======================= Add Salvoes ======================= */
