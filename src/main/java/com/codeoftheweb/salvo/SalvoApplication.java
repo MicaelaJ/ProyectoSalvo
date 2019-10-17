@@ -52,10 +52,8 @@ public class SalvoApplication {
                                       SalvoRepository salvoRepository,
                                       ScoreRepository scoreRepository) {
         return (args) -> {
-            /*guarda jugadores de prueba*/
 
-            /* =================== PLAYERS =================== */
-            Player p1 = new Player("j.bauer@ctu.gov", passwordEncoder().encode("24"));//instancia
+            Player p1 = new Player("j.bauer@ctu.gov", passwordEncoder().encode("24"));
             Player p2 = new Player("c.obrian@ctu.gov", passwordEncoder().encode("42"));
             Player p3 = new Player("kim.bauer@gmail.com", passwordEncoder().encode("kb"));
             Player p4 = new Player("t.ailmeida@ctu.gov", passwordEncoder().encode("mole"));
@@ -63,7 +61,6 @@ public class SalvoApplication {
 
             Date date = new Date();
 
-            /* =================== GAMES ===================== */
             Game g1 = new Game(date);
             Game g2 = new Game(Date.from(date.toInstant().plusSeconds(3600))); //suma 1 hora mas
             Game g3 = new Game(Date.from(date.toInstant().plusSeconds(7200))); //suma 2 horas ma// s
@@ -75,7 +72,6 @@ public class SalvoApplication {
 
             gameRepository.saveAll(Arrays.asList(g1, g2, g3, g4, g5, g6, g7, g8));
 
-            /* =================== GAME PLAYERS =================== */
             GamePlayer gp1 = new GamePlayer(date, g1, p1);
             GamePlayer gp2 = new GamePlayer(date, g1, p2);
             GamePlayer gp3 = new GamePlayer(date, g2, p1);
@@ -94,7 +90,6 @@ public class SalvoApplication {
             gamePlayerRepository.saveAll(Arrays.asList(gp1, gp2, gp3, gp4, gp5, gp6, gp7, gp8, gp9, gp10, gp11,
                     gp12, gp13, gp14));
 
-            /* =================== SHIPS =================== */
             Ship s1 = new Ship(gp1, "destroyer", new HashSet<>(Arrays.asList("H2", "H3", "H4")));
             Ship s2 = new Ship(gp1, "submarine", new HashSet<>(Arrays.asList("E1", "F1", "G1")));
             Ship s3 = new Ship(gp1, "patrolboat", new HashSet<>(Arrays.asList("B4", "B5")));
@@ -127,7 +122,6 @@ public class SalvoApplication {
                     s9, s10, s11, s12, s13, s14, s15, s16, s17, s18, s19, s20, s21,
                     s22, s23, s24, s25, s26, s27));
 
-            /* =================== SALVOES =================== */
             Salvo sa1 = new Salvo(1, gp1, new HashSet<>(Arrays.asList("B5", "C5", "F1")));
             Salvo sa2 = new Salvo(1, gp2, new HashSet<>(Arrays.asList("B4", "B5", "B6")));
             Salvo sa3 = new Salvo(2, gp1, new HashSet<>(Arrays.asList("F2", "D5")));
@@ -153,7 +147,6 @@ public class SalvoApplication {
             salvoRepository.saveAll(Arrays.asList(sa1, sa2, sa3, sa4, sa5, sa6, sa7, sa8, sa9, sa10,
                     sa11, sa12, sa13, sa14, sa15, sa16, sa17, sa18, sa19, sa20, sa21));
 
-            /* =================== SCORES =================== */
             Score sc1 = new Score(g1, p1, 1, date);
             Score sc2 = new Score(g1, p2, 0, date);
             Score sc3 = new Score(g2, p1, 0.5, date);
@@ -169,7 +162,6 @@ public class SalvoApplication {
     }
 }
 
-/* ================= AUTENTICACION (USER) ================= */
 @Configuration
 class WebSecurityConfiguration extends GlobalAuthenticationConfigurerAdapter {
 
@@ -190,7 +182,6 @@ class WebSecurityConfiguration extends GlobalAuthenticationConfigurerAdapter {
     }
 }
 
-/* ================= AUTORIZACION ================= */
 @Configuration
 @EnableWebSecurity
 class WebSecurityConfig extends WebSecurityConfigurerAdapter {

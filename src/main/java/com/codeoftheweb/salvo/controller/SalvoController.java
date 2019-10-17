@@ -346,7 +346,7 @@ public class SalvoController {
                 destroyerDamage = 0,
                 patrolboatDamage = 0;
 
-        for (Salvo salvoOpp : orderSalvoes(getOpponent(gamePlayer).getSalvoes()) ) {
+        for (Salvo salvoOpp : orderSalvoes(getOpponent(gamePlayer).getSalvoes())) {
             long
                     carrieHits = getHitsShipType(gamePlayer, salvoOpp, "carrier"),
                     battleshipHits = getHitsShipType(gamePlayer, salvoOpp, "battleship"),
