@@ -172,7 +172,6 @@ public class SalvoController {
     /* ======================= Add Salvoes ======================= */
     /* verifica player
      * "add salvoes" button en el front end. */
-
     @RequestMapping(path = "/games/players/{gamePlayerId}/salvoes", method = RequestMethod.POST)
     public ResponseEntity<Map<String, Object>> addSalvoes(@PathVariable Long gamePlayerId,
                                                           @RequestBody Salvo salvo,
@@ -287,7 +286,7 @@ public class SalvoController {
         }
     }
 
-    // indica numero de sunks ships para verificar game over
+    // indica numero de sunks ships
     private int getSunks(GamePlayer gamePlayer) {
         GamePlayer opp = getOpponent(gamePlayer);
         List<String> ships = new ArrayList<>();
@@ -425,7 +424,6 @@ public class SalvoController {
                 .map(salvo -> salvo.salvoDTO())
                 .collect(Collectors.toList());
     }
-
 
     // Score
     private List<Map<String, Object>> getAllScore(Set<Score> scores) {
