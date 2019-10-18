@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 @Entity
 public class Player {
-    /* ======================= Atributos ======================= */
+    /* ======================= ATTRIBUTES ======================= */
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
     @GenericGenerator(name = "native", strategy = "native")
@@ -19,15 +19,15 @@ public class Player {
     private String userName;
     private String password;
 
-    /* Metodo donde creo una relacion One to many entre Player y GamePlayer */
+    /* Method where I create a -One to many- relationship between Player and GamePlayer */
     @OneToMany(mappedBy = "player", fetch = FetchType.EAGER)
     private Set<GamePlayer> gamePlayers;
 
-    /* Metodo donde creo una relacion One to many entre Player y Score */
+    /* Method where I create a -One to many- relationship between Player and GamePlayer */
     @OneToMany(mappedBy = "player", fetch = FetchType.EAGER)
     private Set<Score> scores;
 
-    /* ======================= Constructor ======================= */
+    /* ======================= CONSTRUCTOR ======================= */
     public Player() {
     }
 
@@ -58,7 +58,10 @@ public class Player {
     }
 
     public List<Game> getGames() {
-        return this.gamePlayers.stream().map(GamePlayer::getGame).collect(Collectors.toList());
+        return this.gamePlayers
+                .stream()
+                .map(GamePlayer::getGame)
+                .collect(Collectors.toList());
     }
 
     /* ======================= Setters ======================= */
@@ -78,21 +81,24 @@ public class Player {
         this.password = password;
     }
 
-    /* Metodos para TotalScore - Win - Lost - Tied */
+    /* Method for TotalScore - Win - Lost - Tied */
     public long getWinScore() {
-        return this.getScores().stream()
+        return this.getScores()
+                .stream()
                 .filter(score -> score.getScore() == 1.0D)
                 .count();
     }
 
     public double getTiedScore() {
-        return this.getScores().stream()
+        return this.getScores()
+                .stream()
                 .filter(score -> score.getScore() == 0.5D)
                 .count();
     }
 
     public long getLostScore() {
-        return this.getScores().stream()
+        return this.getScores()
+                .stream()
                 .filter(score -> score.getScore() == 0D)
                 .count();
     }
@@ -101,13 +107,13 @@ public class Player {
         return this.getWinScore() * 1.0D + this.getTiedScore() * 0.5D + this.getLostScore() * 0D;
     }
 
-    /* Metodo */
+    /* Method */
     public void addGamePlayer(GamePlayer gamePlayer) {
         this.gamePlayers.add(gamePlayer);
     }
 
     /* ======================= DTO ======================= */
-    //DTO para Player donde tengo id y username para cada player
+    // DTO for Player where I have 'id' and 'username' for each player
     public Map<String, Object> getPlayerDTO() {
         Map<String, Object> dto = new LinkedHashMap<String, Object>();
         dto.put("id", this.getId());

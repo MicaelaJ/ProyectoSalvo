@@ -9,7 +9,7 @@ import java.util.Map;
 
 @Entity
 public class Score {
-    /* ======================= Atributos ======================= */
+    /* ======================= ATTRIBUTES ======================= */
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
     @GenericGenerator(name = "native", strategy = "native")
@@ -18,17 +18,17 @@ public class Score {
     private double score;
     private Date finishDate;
 
-    /* Metodo donde creo una relacion One to many entre Score y Game */
+    /* Method where I create a -Many to one- relationship between Score and Game */
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "gamePlayer_id")
     private Game game;
 
-    /* Metodo donde creo una relacion One to many entre Score y Player */
+    /* Method where I create a -Many to one- relationship between Score and Player */
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "player_id")
     private Player player;
 
-    /* ======================= Constructor ======================= */
+    /* ======================= CONSTRUCTOR ======================= */
     public Score() {
     }
 

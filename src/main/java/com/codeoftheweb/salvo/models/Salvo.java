@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 
 @Entity
 public class Salvo {
-    /* ======================= Atributos ======================= */
+    /* ======================= ATTRIBUTES ======================= */
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
     @GenericGenerator(name = "native", strategy = "native")
@@ -16,12 +16,12 @@ public class Salvo {
 
     private int turn;
 
-    /* Metodo donde creo una relacion One to many entre Salvo y GamePlayer */
+    /* Method where I create a -One to many- relationship between Salvo and GamePlayer */
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "gamePlayer_id")
     private GamePlayer gamePlayer;
 
-    /* Metodo para SalvoLocations */
+    /* Method for SalvoLocations */
     @ElementCollection
     @Column(name = "salvoLocations")
     private Set<String> salvoLocations = new HashSet<>();
@@ -34,7 +34,7 @@ public class Salvo {
                 .collect(Collectors.toList());
     }
 
-    /* ======================= Constructor ======================= */
+    /* ======================= CONSTRUCTOR ======================= */
     public Salvo() {
     }
 

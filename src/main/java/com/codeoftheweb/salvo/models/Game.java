@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 @Entity
 public class Game {
 
-    /* ======================= Atributos ======================= */
+    /* ======================= ATTRIBUTES ======================= */
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
     @GenericGenerator(name = "native", strategy = "native")
@@ -18,22 +18,23 @@ public class Game {
     private Date creationDate;
     private double score;
 
-    /* Metodo donde creo una relacion One to many entre Game y GamePlayer */
+    /* Method where I create a -One to many- relationship between Game and GamePlayer */
     @OneToMany(mappedBy = "game", fetch = FetchType.EAGER)
     private Set<GamePlayer> gamePlayers;
 
-    /* Metodo donde creo una relacion One to many entre Game y Score */
+    /* Method where I create a -One to many- relationship between Game and Score */
     @OneToMany(mappedBy = "game", fetch = FetchType.EAGER)
     private Set<Score> scores;
 
-    public List<String> getAllUserNames(){
+    public List<String> getAllUserNames() {
         return gamePlayers.stream().map(game -> game.getPlayer().getUserName()).collect(Collectors.toList());
     }
-    /* ======================= Constructor ======================= */
+
+    /* ======================= CONSTRUCTOR ======================= */
     public Game() {
     }
 
-    /* Declaracion de metodo */
+    // Method declaration
     public Game(Date creationDate) {
         this.creationDate = creationDate;
     }

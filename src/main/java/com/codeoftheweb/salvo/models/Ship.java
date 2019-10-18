@@ -8,25 +8,25 @@ import java.util.stream.Collectors;
 
 @Entity
 public class Ship {
-    /* ======================= Atributos ======================= */
+    /* ======================= ATTRIBUTES ======================= */
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
     @GenericGenerator(name = "native", strategy = "native")
     private long id;
     private String type;
 
-    /* Metodo donde creo una relacion One to many entre Ship y GamePlayer */
+    /* Method where I create a -Many to one- relationship between Ship and gamePlayer */
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "gamePlayer_id")
     private GamePlayer gamePlayer;
 
-    /* Metodo para ShipLocations */
+    /* Method for ShipLocations */
     @ElementCollection
     @Column(name = "shipLocations")
     private Set<String> locations = new HashSet<>();
 
 
-    /* ======================= Constructor ======================= */
+    /* ======================= CONSTRUCTOR ======================= */
     public Ship() {
     }
 

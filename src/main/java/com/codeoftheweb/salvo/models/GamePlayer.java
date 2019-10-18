@@ -8,7 +8,7 @@ import java.util.*;
 
 @Entity
 public class GamePlayer {
-    /* ======================= Atributos ======================= */
+    /* ======================= ATTRIBUTES ======================= */
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
     @GenericGenerator(name = "native", strategy = "native")
@@ -16,26 +16,26 @@ public class GamePlayer {
 
     private Date joinDate;
 
-    /* Metodo donde creo una relacion One to many entre GamePlayer y Player */
+    /* Method where I create a -Many to one- relationship between GamePlayer and Player */
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "player_id")
     private Player player;
 
-    /* Metodo donde creo una relacion One to many entre GamePlayer y Game */
+    /* Method where I create a -Many to one- relationship between GamePlayer and Game */
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "game_id")
     private Game game;
 
-    /* Metodo donde creo una relacion One to many entre GamePlayer y Ship */
+    /* Method where I create a -One to many- relationship between GamePlayer and Ship */
     @OneToMany(mappedBy = "gamePlayer", fetch = FetchType.EAGER)
     private Set<Ship> ships;
 
-    /* Metodo donde creo una relacion One to many entre GamePlayer y Salvo */
+    /* Method where I create a -One to many- relationship between GamePlayer and Salvo */
     @OneToMany(mappedBy = "gamePlayer", fetch = FetchType.EAGER)
     private Set<Salvo> salvoes;
 
 
-    /* ======================= Constructor ======================= */
+    /* ======================= CONSTRUCTOR ======================= */
     public GamePlayer() {
     }
 
@@ -102,7 +102,7 @@ public class GamePlayer {
         this.joinDate = joinDate;
     }
 
-    /* Metodos */
+    /* Methods */
     public void addShip(Ship ship) {
         this.ships.add(ship);
         ship.setGamePlayer(this);
@@ -112,6 +112,7 @@ public class GamePlayer {
         this.salvoes.add(salvo);
         salvo.setGamePlayer(this);
     }
+
     /* =======================  DTO ======================= */
     public Map<String, Object> getGamePlayerDTO() {
         Map<String, Object> dto = new LinkedHashMap<String, Object>();
